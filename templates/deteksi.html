@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:400,600,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="static/fonts/icomoon/style.css">
+
+    <link rel="stylesheet" href="static/css/owl.carousel.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    
+    <!-- Style -->
+    <link rel="stylesheet" href="static/css/style.css">
+
+    <!-- favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <title>SafetyCheck</title>
+  </head>
+  <body>   
+    <div class="site-navbar-wrap">
+      <div class="site-navbar site-navbar-target js-sticky-header">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-2">
+              <img src="static/images/logo.png" width="30" height="30" alt="Logo">
+              <h2>SafetyCheck</h2>
+            </div>
+            <div class="col-10">
+              <nav class="site-navigation text-right" role="navigation">
+                <div class="container">
+                  <div class="d-inline-block d-lg-none ml-md-0 mr-auto py-3"><a href="#" class="site-menu-toggle js-menu-toggle text-white"><span class="icon-menu h3"></span></a></div>
+
+                  <ul class="site-menu main-menu js-clone-nav d-none d-lg-block">
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/deteksi" class="nav-link">Detection</a></li>
+                    <li><a href="/about" class="nav-link">About</a></li>
+                  </ul>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero" style="background-image: url('static/images/Detection.png');">
+        <div class="button-wrapper-deteksi">
+            <div class="herofont">
+            <h1 class="fonts" style="font-weight: bold">Object Detection</h1>
+            <h4 class="fonts-detek">Unggah gambar atau menggunakan webcam secara real time untuk mengidentifikasi <br> dan menentukan lokasi dari Alat Pelindung Diri (APD) yang digunakan.</h4>
+            </div>            
+          </div>
+      </div>
+      <h1>Deteksi Objek dengan Flask</h1>
+      <form id="upload-form" action="/predict" method="POST" enctype="multipart/form-data">
+         <input type="file" name="file"><br>
+         <input type="submit" value="Upload">
+      </form>
+      <br>
+      <div id="result"></div>
+      <br>
+      <button id="webcam-button">Webcam</button>
+      <br>
+      <div id="webcam-container"></div>
+      <br>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+      <script>
+         $('#webcam-button').click(function() {
+            $('#upload-form').hide();
+            $(this).hide();
+            $('#webcam-container').show();
+            var video = document.createElement('video');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('muted', '');
+            video.setAttribute('playsinline', '');
+            navigator.mediaDevices.getUserMedia({video: true}).then(function(stream) {
+               video.srcObject = stream;
+               $('#webcam-container').append(video);
+               var canvas = document.createElement('canvas');
+               canvas.setAttribute('width', video.videoWidth);
+               canvas.setAttribute('height', video.videoHeight);
+               $('#webcam-container').append(canvas);
+               var context = canvas.getContext('2d');
+               setInterval(function() {
+                  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                  var dataURL = canvas.toDataURL('image/jpeg', 1.0);
+                  $.ajax({
+                     type: 'POST',
+                     url: '/predict',
+                     data: {image: dataURL},
+                     success: function(response) {
+                        $('#result').html(response);
+                     },
+                     error: function(xhr, status, error) {
+                        alert('Error: ' + error.message);
+                     }
+                  });
+               }, 1000 / 30);
+            }).catch(function(error) {
+               alert('Error: ' + error.message);
+            });
+         });
+      </script>
+      
+      
+            
+      <a href="/chatbot" class="livechat">
+        <img src="static/images/livechat.png" alt="Live Chat" />
+      </a>            
+    <script src="static/js/jquery-3.3.1.min.js"></script>
+    <script src="static/js/popper.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/jquery.sticky.js"></script>
+    <script src="static/js/main.js"></script>
+    <script src="static/js/slider.js"></script>
+    <script src="static/js/deteksi.js"></script>
+  </body>
+  <footer class="footer">
+    <div class="footer-left">
+      <figure>
+        <img src="static/images/logo.png" alt="gambar footer">
+        <p><a href="https://www.example.com">safetycheck@gmail.com</a></p>
+      </figure> 
+    </div>
+    <div class="footer-right">
+      <figure>
+        <p >Support By:</p>
+        <a href="https://orbitfutureacademy.id/"><img src="static/images/orbit.png" alt="gambar1"></a>
+        <a href="https://ittelkom-pwt.ac.id/"><img src="static/images/fayza.png" alt="gambar2"></a>
+        <a href="https://www.amikompurwokerto.ac.id/"><img src="static/images/aji.png" alt="gambar3"></a>
+        <a href="https://www.ukdw.ac.id/"><img src="static/images/ardi.png" alt="gambar4"></a>
+        <a href="https://unmaha.ac.id/"><img src="static/images/kinanti.png" alt="gambar5"></a>
+      </figure>   
+    </div>
+    <p class="footer-copyright">
+      &copy; 2023 Broyden1. All rights reserved.
+    </p>
+  </footer>  
+</html>
